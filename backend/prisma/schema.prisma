@@ -1,0 +1,146 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+enum UserRole {
+    ADMIN
+    USER
+}
+
+enum BookingStatus {
+    PENDING
+    CONFIRMED
+    CANCELLED
+    COMPLETED
+    ACTIVE
+}
+
+enum FuelType {
+    PETROL
+    DIESEL
+    ELECTRIC
+    CNG
+}
+
+enum TransmissionType {
+    MANUAL
+    AUTOMATIC
+}
+
+model User {
+    id           String   @id @default(uuid())
+    email        String   @unique
+    phone        String   @unique
+    passwordHash String   @map("password_hash")
+    firstName    String   @map("first_name")
+    lastName     String   @map("last_name")
+    role         UserRole @default(USER)
+    isVerified   Boolean  @default(false) @map("is_verified")
+    isActive     Boolean  @default(true) @map("is_active")
+    profileImage String?  @map("profile_image")
+
+    refreshTokens RefreshToken[]
+    bookings      Booking[]
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("users")
+}
+
+model RefreshToken {
+    id        String   @id @default(uuid())
+    token     String   @unique
+    userId    String   @map("user_id")
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    expiresAt DateTime @map("expires_at")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("refresh_tokens")
+}
+
+model City {
+    id           String        @id @default(uuid())
+    name         String
+    state        String
+    isActive     Boolean       @default(true) @map("is_active")
+    sublocations Sublocation[]
+    country      String
+    createdAt    DateTime      @default(now()) @map("created_at")
+    updatedAt    DateTime      @updatedAt @map("updated_at")
+
+    @@map("cities")
+}
+
+model Sublocation {
+    id        String   @id @default(uuid())
+    name      String
+    address   String
+    latitude  Float
+    longitude Float
+    cityId    String   @map("city_id")
+    city      City     @relation(fields: [cityId], references: [id])
+    cars      Car[]
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    isActive  Boolean  @default(true) @map("is_active")
+
+    @@unique([name, cityId])
+    @@map("sublocations")
+}
+
+model Car {
+    id               String           @id @default(uuid())
+    name             String
+    model            String
+    brand            String
+    year             String
+    fuelType         FuelType         @map("fuel_type")
+    transmissionType TransmissionType @map("transmission_type")
+    regulationNo     String           @unique @map("regulation_no")
+    seats            Int
+    kmLimitPerDay    Int              @map("km_limit_per_day")
+    pricePerDay      Float            @map("price_per_day")
+    pricePerHour     Float            @map("price_per_hour")
+    extraKmCharge    Float            @map("extra_km_charge")
+    status           CarStatus        @default(AVAILABLE)
+    images           String[]
+    features         String[]
+    sublocationId    String           @map("sublocation_id")
+    sublocation      Sublocation      @relation(fields: [sublocationId], references: [id])
+
+    bookings Booking[]
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("cars")
+}
+
+model Booking {
+    id         String        @id @default(uuid())
+    userId     String        @map("user_id")
+    user       User          @relation(fields: [userId], references: [id])
+    carId      String        @map("car_id")
+    car        Car           @relation(fields: [carId], references: [id])
+    startTime  DateTime      @map("start_time")
+    endTime    DateTime      @map("end_time")
+    totalPrice Float         @map("total_price")
+    status     BookingStatus @default(PENDING)
+    totalHours Float         @map("total_hours")
+    basePrice  Float         @map("base_price")
+    kmLimitTotal Int           @map("km_limit_total")
+    pickupAddress String        @map("pickup_address")
+    note        String?
+    
+    createdAt  DateTime      @default(now()) @map("created_at")
+    updatedAt  DateTime      @updatedAt @map("updated_at")
+
+    @@map("bookings")
+}
