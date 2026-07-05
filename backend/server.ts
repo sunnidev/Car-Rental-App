@@ -5,7 +5,7 @@ import helmet from "helmet";
 import { config } from "./src/config/env";
 import { errorMiddleware } from "./src/middleware/error.middleware";
 import { logger } from "./src/utils/logger";
-
+import v1Routes from  "./src/routes/v1/index";
 
 const app = express();
 
@@ -44,6 +44,8 @@ app.get
             timeStamp: new Date().toISOString()
         })
     })
+
+    app.use("/api/v1", v1Routes)
 
 
 app.use((req, res) => {
