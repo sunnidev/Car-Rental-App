@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon --watch 'src' --exec ts-node src/server.ts",
+    "dev": "NODE_ENV=development nodemon --watch 'src' --watch 'server.ts' --exec ts-node server.ts",
     "build": "tsc",
     "start": "NODE_ENV=production node dist/server.js",
     "db:generate": "prisma generate",

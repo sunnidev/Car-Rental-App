@@ -1,10 +1,10 @@
 import cors from "cors";
-import { config } from "./src/config/env";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import { config } from "./src/config/env";
+import { errorMiddleware } from "./src/middleware/error.middleware";
 import { logger } from "./src/utils/logger";
-import { timeStamp } from "node:console";
 
 
 const app = express();
@@ -53,3 +53,11 @@ app.use((req, res) => {
             message: 'Route not found'
         })
 })
+
+app.use(errorMiddleware)
+
+app.listen(config.PORT, () => {
+    logger.info(`Server is running on port ${config.PORT}`)
+})
+
+export default app
