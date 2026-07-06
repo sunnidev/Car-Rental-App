@@ -1,16 +1,17 @@
-import { User } from "../types";
-import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
-import { authService } from "@/backend/src/services/auth.service";
+import { create } from "zustand";
+import { api } from "../lib/axios";
+import { authService } from "../services/auth.service";
+import { User } from "../types";
 
 
 interface AuthStore {
-    user: User | null
-    isAuthenticated: boolean
-    isLoading: boolean
-    error: string | null
-    login: (email: string, password: string) => Promise<void>
-    register(data: {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    error: string | null;
+    login: (email: string, password: string) => Promise<void>;
+    register: (data: {
         email: string;
         phone: string;
         password: string;
@@ -23,7 +24,7 @@ interface AuthStore {
     loadUser: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
     user: null,
     isAuthenticated: false,
     isLoading: false,
@@ -46,7 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         }
     },
 
-    login: async (email, password) => {
+    login: async (email: string, password: string) => {
         set({ isLoading: true, error: null })
 
         try {
@@ -58,8 +59,15 @@ export const useAuthStore = create<AuthState>((set) => ({
             throw new Error(message)
         }
     },
-    register: async (data) => {
-         try {
+
+    register: async (data: {
+        email: string;
+        phone: string;
+        password: string;
+        firstName: string;
+        lastName: string;
+    }) => {
+        try {
             const result = await authService.register(data)
             set({ user: result.user, isAuthenticated: true, isLoading: false })
         } catch (error: any) {
@@ -67,11 +75,15 @@ export const useAuthStore = create<AuthState>((set) => ({
             set({ error: message, isLoading: false })
             throw new Error(message)
         }
+    },
+
     logout: async () => {
         set({ isLoading: true })
         await authService.logout();
         set({ user: null, isAuthenticated: false, isLoading: false })
     },
-    setUser: (user) => set({ user, isAuthenticated: true }),
+
+    setUser: (user: User) => set({ user, isAuthenticated: true }),
+
     clearError: () => set({ error: null }),
 }))
