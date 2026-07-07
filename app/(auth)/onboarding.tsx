@@ -11,7 +11,7 @@ const slides = [
     tag: 'WELCOME TO DRIVEINDIA',
     title: 'Drive Anywhere,\nAnytime.',
     subtitle: 'Premium self-drive cars available across Bengaluru, Mumbai & Hyderabad.',
-    image: 'https://sslphotos.jato.com/PHOTO400/SSCIND/HYUNDAI/EXTER/2023/50D.JPG',
+    image: 'https://sslphotos.jato.com/PHOTO400/SSCIND/MARUTI%20SUZUKI/SWIFT/2023/5HA.JPG',
     accentClass: 'bg-[#E8500A]',
     accentText: 'text-[#E8500A]',
     btnClass: 'bg-[#E8500A]',
@@ -39,12 +39,69 @@ const slides = [
 ]
 
 const Onboarding = () => {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const flatListRef = useRef<FlatList>(null)
+  const [activeIndex, setActiveIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
+  const slide = slides[activeIndex]
 
   return (
-    <SafeAreaView className='flex-1'> 
+    <SafeAreaView className='flex-1 bg-[#0A0A0F] '>
+      <View>
+        {activeIndex < slides.length - 1 ? (
+          <TouchableOpacity
+            onPress={() => router.replace('/(auth)/login' as any)}
+            className="py-2 px-4">
+            <Text className="text-[#5A5A72] text-sm font-medium tracking-widest uppercase">
+              Skip
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <View className="py-2 px-4 opacity-0">
+            <Text>Skip</Text>
+          </View>
+        )}
+      </View>
 
+      <FlatList
+        ref={flatListRef}
+        data={slides}
+        keyExtractor={(item) => item.id}
+        horizontal
+        pagingEnabled
+        scrollEnabled={false}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <View className='px-6 ' style={{ width }}>
+            <View className='rounded-3xl bg-[#13131A] border border-[#22222E] h-80 overflow-hidden mb-10 items-center justify-center'>
+              <View className='absolute top-4 left-4 bg-[#0a0a0f] rounded-full px-3 py-1 border border-[#22222E]'>
+                <Text className='text-[#9494a8] text-sm tracking-widest uppercase'>Self Drive</Text>
+              </View>
+              <Image
+                source={{ uri: item?.image }}
+                className='w-full h-52'
+                resizeMode='contain'
+              />
+
+              <View className={`absolute bottom-0 left-0 right-0 h-1 ${item.accentClass} opacity-60`} />
+            </View>
+            <View className='flex-row items-center mb-3'>
+              <View className={`w-5 h-0.5 mr-2 ${item.accentClass}`} />
+              <Text className={`text-xs font-bold tracking-[3px] ${item.accentText}`}>{item?.tag}</Text>
+            </View>
+            <Text className='text-white font-bold text-5xl leading-tight mb-4'>{item.title}</Text>
+            <Text className='text-[#9494a8] text-lg leading-8'>{item.subtitle}</Text>
+          </View>
+        )}
+      />
+
+      <View className='px-6 pb-10'>
+        <View className='flex-row items-center mb-8'> 
+          {slides.map((_, i) => (
+            <View key={i} className={`h-1.5 rounded-full mr-1.5 ${i === activeIndex ? `w-6 ${slide.accentClass}` : 'w-1.5 bg-[#22222E]'}`}>
+
+            </View>
+          ))}
+        </View>
+      </View>
     </SafeAreaView>
   )
 }
