@@ -39,10 +39,19 @@ const slides = [
 ]
 
 const Onboarding = () => {
+
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const slide = slides[activeIndex]
 
+  const handleNext = () => {
+    if (activeIndex < slides.length - 1) {
+      flatListRef.current?.scrollToIndex({ index: activeIndex + 1 });
+      setActiveIndex(activeIndex + 1);
+    } else {
+      router.replace('/(auth)/login' as any)
+    }
+  }
   return (
     <SafeAreaView className='flex-1 bg-[#0A0A0F] '>
       <View>
@@ -94,13 +103,32 @@ const Onboarding = () => {
       />
 
       <View className='px-6 pb-10'>
-        <View className='flex-row items-center mb-8'> 
+        <View className='flex-row items-center mb-8'>
           {slides.map((_, i) => (
             <View key={i} className={`h-1.5 rounded-full mr-1.5 ${i === activeIndex ? `w-6 ${slide.accentClass}` : 'w-1.5 bg-[#22222E]'}`}>
 
             </View>
           ))}
         </View>
+
+        <TouchableOpacity activeOpacity={0.8}
+          className={`py-5 rounded-2xl items-center ${slide.btnClass}`}
+          onPress={handleNext}
+        >
+          <Text className='text-white font-bold text-sm tracking-widest uppercase'>{activeIndex === slides.length - 1 ? 'Lets Go' : 'Continue'}</Text>
+        </TouchableOpacity>
+
+        {activeIndex === slides.length - 1 && (
+          <TouchableOpacity
+            onPress={() => router.replace('/(auth)/login' as any)}
+            className="items-center mt-5"
+          >
+            <Text className="text-[#5A5A72] text-sm ">
+              Already have an account?{' '}
+              <Text className="text-[#E8500A] font-semiBold">Sign In</Text>
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   )
